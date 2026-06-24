@@ -5,6 +5,60 @@
 /// `DIP`: Dependency injetced with the help of highest level of abstarction like protocolos
 /// In `DIP` dependencies are always passed in highest level of abstarction like protocolos
 
+// DIP:
+// MARK: - Model
+struct UserModel {
+    var name: String
+    var id: String
+}
+
+// MARK: - Abstraction
+protocol UserProtocol{
+    func fetchProfile(user: UserModel)
+}
+
+// MARK: - Low Level Modules
+class UserAPIService: UserProtocol{
+    func fetchProfile(user: UserModel) {
+        print("Fetching details from api")
+        print("Username \(user.name) for this \(user.id)")
+    }
+}
+
+class UserDatabaseService: UserProtocol{
+    func fetchProfile(user: UserModel) {
+        print("Fetching details from db")
+        print("Username \(user.name) for this \(user.id)")
+    }
+}
+
+// MARK: - High-Level Module
+class UserViewModel{
+    private let userService: UserProtocol
+    
+    init(userService: UserProtocol) {
+        self.userService = userService
+    }
+    
+    func userData(user: UserModel){
+        userService.fetchProfile(user: user)
+    }
+}
+
+// MARK: - Usage
+let users = UserModel(name: "Soumya", id: "100")
+
+// Inject API Service
+let apiVM = UserViewModel(userService: UserAPIService())
+apiVM.userData(user: users)
+
+print("----------------")
+
+
+// Inject DB Service
+let dbVM = UserViewModel(userService: UserAPIService())
+dbVM.userData(user: users)
+
 // MARK: - Model
 struct User {
     var name: String
